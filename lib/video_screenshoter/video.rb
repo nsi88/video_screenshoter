@@ -15,18 +15,22 @@ module VideoScreenshoter
         if time.is_a?(String) && matches = time.match(/(.*)%$/)
           time = matches[1].to_f / 100 * duration
         end
+        time = time.to_i
         time = duration + time if time < 0
         time
       end
     end
 
-    def make_screenshots
+    def run
       times.each do |time|
         cmd = "#{ffmpeg} -i #{input} -acodec -an -ss #{time} -f image2 -vframes 1 -y #{sprintf(File.join(output_dir, output_file), time)} 2>/dev/null 1>&2"
         puts cmd if verbose
         `#{cmd}`
       end
     end
+
+    alias :make_screenshots :run
+    alias :make_thumbnails :run
 
     private
 
