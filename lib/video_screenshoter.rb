@@ -1,4 +1,5 @@
 require "video_screenshoter/version"
+require "fileutils"
 require "video_screenshoter/video"
 
 module VideoScreenshoter

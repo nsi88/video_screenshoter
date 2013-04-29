@@ -6,8 +6,9 @@ module VideoScreenshoter
 
     def initialize params
       [:ffmpeg, :output_dir, :output_file, :verbose].each do |attr|
-        self.send("#{attr}=".to_sym, params[:attr].nil? ? VideoScreenshoter.send(attr) : params[:attr])
+        self.send("#{attr}=".to_sym, params[attr].nil? ? VideoScreenshoter.send(attr) : params[attr])
       end
+      FileUtils.mkdir_p self.output_dir
       self.input = params[:input] or raise ArgumentError.new('Input is needed')
       self.duration = input_duration or raise ArgumentError.new('Incorrect video file')
       self.times = params[:times].to_a.map do |time|
