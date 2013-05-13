@@ -15,8 +15,8 @@ module VideoScreenshoter
         if time.is_a?(String) && matches = time.match(/(.*)%$/)
           time = matches[1].to_f / 100 * duration
         end
-        time = time.to_i
         time = duration + time if time < 0
+        time = time.to_i
         time
       end
     end
