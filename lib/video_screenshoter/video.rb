@@ -21,9 +21,13 @@ module VideoScreenshoter
       end
     end
 
+    def output_fullpath time
+      sprintf(File.join(output_dir, output_file), time)
+    end
+
     def run
       times.each do |time|
-        cmd = "#{ffmpeg} -i #{input} -acodec -an -ss #{time} -f image2 -vframes 1 -y #{sprintf(File.join(output_dir, output_file), time)} 2>/dev/null 1>&2"
+        cmd = "#{ffmpeg} -i #{input} -acodec -an -ss #{time} -f image2 -vframes 1 -y #{output_fullpath(time)} 2>/dev/null 1>&2"
         puts cmd if verbose
         `#{cmd}`
       end
