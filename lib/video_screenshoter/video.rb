@@ -2,7 +2,7 @@
 
 module VideoScreenshoter
   class Video
-    attr_accessor :ffmpeg, :output_dir, :output_file, :input, :times, :duration, :verbose
+    attr_accessor :ffmpeg, :output_dir, :output_file, :input, :times, :duration, :verbose, :size
 
     def initialize params
       [:ffmpeg, :output_dir, :output_file, :verbose].each do |attr|
@@ -19,6 +19,7 @@ module VideoScreenshoter
         time = time.to_i
         time
       end
+      self.size = params[:size] ? "-s #{params[:size]}" : ''
     end
 
     def output_fullpath time
@@ -27,7 +28,7 @@ module VideoScreenshoter
 
     def run
       times.each do |time|
-        cmd = "#{ffmpeg} -i #{input} -acodec -an -ss #{time} -f image2 -vframes 1 -y #{output_fullpath(time)} 2>/dev/null 1>&2"
+        cmd = "#{ffmpeg} -i #{input} -acodec -an -ss #{time} #{size} -f image2 -vframes 1 -y #{output_fullpath(time)} 2>/dev/null 1>&2"
         puts cmd if verbose
         `#{cmd}`
       end
