@@ -1,6 +1,8 @@
 require "video_screenshoter/version"
 require "fileutils"
+require "video_screenshoter/abstract"
 require "video_screenshoter/video"
+require "video_screenshoter/hls"
 
 module VideoScreenshoter
   class << self
@@ -12,6 +14,8 @@ module VideoScreenshoter
   self.verbose = false
 
   def self.new params
-    VideoScreenshoter::Video.new params
+    raise ArgumentError.new('Incorrect type param') unless [nil, 'hls', 'video'].include? params[:type]
+    params[:type] ||= File.extname(params[:input]) == '.m3u8' ? 'hls' : 'video'
+    params[:type] == 'hls' ? VideoScreenshoter::Hls.new(params) : VideoScreenshoter::Video.new(params)
   end
 end
