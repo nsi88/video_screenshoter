@@ -14,12 +14,15 @@ module VideoScreenshoter
         time + chunk.first
       end
       times.each do |time|
-        chunk_limit = chunk_limits.select { |c| time > c[:start] && time <= c[:end] }.first
-        path = File.join(File.dirname(input), chunk_limit[:path])
-        rel_time = time - chunk_limit[:start]
-        cmd = command(path, output_fullpath(time), rel_time)
-        puts cmd if verbose
-        `#{cmd}`
+        if chunk_limit = chunk_limits.select { |c| time >= c[:start] && time <= c[:end] }.first
+          path = File.join(File.dirname(input), chunk_limit[:path])
+          rel_time = time - chunk_limit[:start]
+          cmd = command(path, output_fullpath(time), rel_time)
+          puts cmd if verbose
+          `#{cmd}`
+        else
+          puts "Time #{time} is incorrect" if verbose
+        end
       end
     end
 
