@@ -29,8 +29,10 @@ module VideoScreenshoter
       end
     end
 
-    def output_fullpath time
-      sprintf(File.join(output_dir, output_file), time)
+    def output_fullpath time, preset = nil
+      res = sprintf(File.join(output_dir, output_file), time)
+      res.sub!(File.extname(res), "_#{preset}#{File.extname(res)}") if preset
+      res
     end
 
     def ffmpeg_command input, output, time
