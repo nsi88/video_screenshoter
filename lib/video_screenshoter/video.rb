@@ -9,9 +9,10 @@ module VideoScreenshoter
 
     def run
       times.each do |time|
-        cmd = command(input, output_fullpath(time), time)
+        cmd = ffmpeg_command(input, output_fullpath(time), time)
         puts cmd if verbose
         `#{cmd}`
+        imagemagick_run output_fullpath(time)
       end
     end
 

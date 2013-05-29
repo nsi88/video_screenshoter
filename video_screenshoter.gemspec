@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "shoulda-context"
 
   spec.requirements << 'ffmpeg'
+  spec.requirements << 'imagemagick'
 end
