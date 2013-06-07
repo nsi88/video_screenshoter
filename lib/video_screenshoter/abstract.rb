@@ -24,7 +24,7 @@ module VideoScreenshoter
       if params[:presets] && params[:presets].is_a?(Hash)
         self.presets = {}
         params[:presets].each do |name, preset|
-          self.presets[name.to_sym] = preset.index('-') == 0 ? preset : "-resize #{preset}"
+          self.presets[name.to_sym] = !preset || preset.empty? || preset.index('-') == 0 ? preset : "-resize #{preset}"
         end
       end
     end
@@ -40,7 +40,12 @@ module VideoScreenshoter
     end
 
     def imagemagick_command input, preset_name
-      "#{imagemagick} #{input} #{presets[preset_name.to_sym]} #{File.join(File.dirname(input), File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))}"
+      preset = presets[preset_name.to_sym]
+      if !preset || preset.empty?
+        "cp #{input} #{File.join(File.dirname(input), File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))}"
+      else
+        "#{imagemagick} #{input} #{preset} #{File.join(File.dirname(input), File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))}"
+      end
     end
 
     def imagemagick_run scr
