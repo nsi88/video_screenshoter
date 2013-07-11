@@ -81,4 +81,22 @@ class VideoScreenshoterTest < Test::Unit::TestCase
       end
     end
   end
+
+  context 'image' do
+    setup do
+      @input = 'test/fixtures/test.jpg'
+      @output_dir = '/tmp/image_screenshots_test'
+      @presets = {:big=>"1280x720", :small=>"144x81", :big43=>"-resize 1280x960^ -gravity center -crop 1280x960+0+0", :small43=>"-resize 144x108^ -gravity center -crop 144x108+0+0"}
+      `rm -r #{@output_dir}` if File.exists? @output_dir
+      @res = VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :presets => @presets, :type => 'image').run
+    end
+    should 'create screenshots' do
+      assert_equal @presets.count, @res.count
+      @res.each do |res|
+        assert File.exists?(res)
+        assert File.size(res) > 0
+      end
+      assert File.size(@res.first) != File.size(@res.last)
+    end
+  end
 end

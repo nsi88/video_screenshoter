@@ -39,12 +39,16 @@ module VideoScreenshoter
       "#{ffmpeg} -i #{input} -acodec -an -ss #{time} #{size} -f image2 -vframes 1 -y #{output} 2>/dev/null 1>&2"
     end
 
+    def output_with_preset input, preset_name
+      File.join(output_dir, File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))
+    end
+
     def imagemagick_command input, preset_name
       preset = presets[preset_name.to_sym]
       if !preset || preset.empty?
-        "cp #{input} #{File.join(File.dirname(input), File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))}"
+        "cp #{input} #{output_with_preset(input, preset_name)}"
       else
-        "#{imagemagick} #{input} #{preset} #{File.join(File.dirname(input), File.basename(input, File.extname(input)) + '_' + preset_name.to_s + File.extname(input))}"
+        "#{imagemagick} #{input} #{preset} #{output_with_preset(input, preset_name)}"
       end
     end
 
