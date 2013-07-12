@@ -20,7 +20,7 @@ module VideoScreenshoter
 
     def run
       imagemagick_run input
-      presets.keys.map { |p| output_with_preset(input, p) }
+      Hash[*presets.keys.map { |p| [p, output_with_preset(input, p)] }.flatten]
     end
 
     alias :make_screenshots :run

@@ -92,11 +92,11 @@ class VideoScreenshoterTest < Test::Unit::TestCase
     end
     should 'create screenshots' do
       assert_equal @presets.count, @res.count
-      @res.each do |res|
+      @res.values.each do |res|
         assert File.exists?(res)
         assert File.size(res) > 0
       end
-      assert File.size(@res.first) != File.size(@res.last)
+      assert File.size(@res.values.first) != File.size(@res.values.last)
     end
   end
 end
