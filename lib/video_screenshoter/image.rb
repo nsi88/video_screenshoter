@@ -4,6 +4,9 @@ module VideoScreenshoter
   class Image < Abstract
 
     def initialize params
+      params.each_with_index do |param, index|
+        params[index] = Shellwords.escape(param) if param.is_a?(String)
+      end
       [:ffmpeg, :imagemagick, :output_dir, :output_file, :verbose].each do |attr|
         self.send("#{attr}=".to_sym, params[attr].nil? ? VideoScreenshoter.send(attr) : params[attr])
       end

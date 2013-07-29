@@ -4,6 +4,7 @@ require "video_screenshoter/abstract"
 require "video_screenshoter/video"
 require "video_screenshoter/hls"
 require "video_screenshoter/image"
+require "shellwords"
 
 module VideoScreenshoter
   class << self
