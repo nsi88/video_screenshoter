@@ -2,7 +2,7 @@
 
 module VideoScreenshoter
   class Abstract
-    attr_accessor :ffmpeg, :imagemagick, :output_dir, :output_file, :input, :times, :duration, :verbose, :size, :presets
+    attr_accessor :ffmpeg, :imagemagick, :output_dir, :output_file, :input, :exact, :times, :offset_start, :offset_end, :duration, :verbose, :size, :presets
 
     def initialize params
       params.each_with_index do |param, index|
@@ -15,15 +15,36 @@ module VideoScreenshoter
       self.input = params[:input]
       self.duration = input_duration
       raise ArgumentError.new('Incorrect or empty m3u8 playlist') if duration.to_i == 0
-      self.times = params[:times].to_a.map do |time|
-        if time.is_a?(String) && matches = time.match(/(.*)%$/)
-          time = matches[1].to_f / 100 * duration
+      
+      # if false ffmpeg uses fast seek by keyframes like: ffmpeg -ss ... -i
+      self.exact = params[:exact]
+      
+      if params[:times]
+        self.exact = true if exact.nil?
+        self.times = params[:times].to_a.map do |time|
+          if time.is_a?(String) && matches = time.match(/(.*)%$/)
+            time = matches[1].to_f / 100 * duration
+          end
+          time = duration + time if time < 0
+          time = time.to_i
+          time
+        end.uniq
+      elsif (number = params[:number].to_i) > 0
+        [:offset_start, :offset_end].each do |attr|
+          if percent = params[attr].to_s.match(/^(\d+)%$/).to_a[1]
+            self.send("#{attr}=", duration * percent.to_i / 100.0)
+          else
+            self.send("#{attr}=", params[attr].to_f)
+          end
         end
-        time = duration + time if time < 0
-        time = time.to_i
-        time
-      end.uniq
+        self.times = number.times.to_a.map { |time| ((offset_start + (duration - offset_start - offset_end) / number * time) * 100).round / 100.0 }.uniq
+      else
+        raise ArgumentError.new('times or number required') if times.empty?
+      end
+      
       self.size = params[:size] ? "-s #{params[:size]}" : ''
+
+      # TODO possibility to replace original image by presetted image
       if params[:presets] && params[:presets].is_a?(Hash)
         self.presets = {}
         params[:presets].each do |name, preset|
@@ -39,7 +60,14 @@ module VideoScreenshoter
     end
 
     def ffmpeg_command input, output, time
-      "#{ffmpeg} -i #{input} -acodec -an -ss #{time} #{size} -f image2 -vframes 1 -y #{output} 2>/dev/null 1>&2"
+      is = exact ? "-i #{input} -ss #{time}" : "-ss #{time} -i #{input}"
+      "#{ffmpeg} #{is} -acodec -an #{size} -f image2 -vframes 1 -y #{output} 1>/dev/null 2>&1"
+    end
+
+    def ffmpeg_run time = nil
+      cmd = ffmpeg_command(input, output_fullpath(time), time)
+      puts cmd if verbose
+      system cmd
     end
 
     def output_with_preset input, preset_name
@@ -60,7 +88,7 @@ module VideoScreenshoter
         presets.each do |preset_name, preset|
           cmd = imagemagick_command(scr, preset_name)
           puts cmd if verbose
-          `#{cmd}`
+          system cmd
         end
       end
     end

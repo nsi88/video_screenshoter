@@ -8,12 +8,7 @@ module VideoScreenshoter
     end
 
     def run
-      times.each do |time|
-        cmd = ffmpeg_command(input, output_fullpath(time), time)
-        puts cmd if verbose
-        `#{cmd}`
-        imagemagick_run output_fullpath(time)
-      end
+      times.each { |time| ffmpeg_run(time) and imagemagick_run(output_fullpath(time)) }
     end
 
     alias :make_screenshots :run
