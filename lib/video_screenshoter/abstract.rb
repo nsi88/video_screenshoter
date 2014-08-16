@@ -31,7 +31,7 @@ module VideoScreenshoter
         end.uniq
       elsif (number = params[:number].to_i) > 0
         [:offset_start, :offset_end].each do |attr|
-          if percent = params[attr].to_s.match(/^(\d+)%$/).to_a[1]
+          if percent = params[attr].to_s.match(/^(\d+)\\?%$/).to_a[1]
             self.send("#{attr}=", duration * percent.to_i / 100.0)
           else
             self.send("#{attr}=", params[attr].to_f)
