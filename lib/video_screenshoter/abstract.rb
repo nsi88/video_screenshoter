@@ -14,11 +14,11 @@ module VideoScreenshoter
       FileUtils.mkdir_p self.output_dir
       self.input = params[:input]
       self.duration = input_duration
-      raise ArgumentError.new('Incorrect or empty m3u8 playlist') if duration.to_i == 0
-      
+      raise ArgumentError.new('Incorrect or empty m3u8 playlist') if duration.nil? || duration <= 0
+    
       # if false ffmpeg uses fast seek by keyframes like: ffmpeg -ss ... -i
       self.exact = params[:exact]
-      
+
       if params[:times]
         self.exact = true if exact.nil?
         self.times = params[:times].to_a.map do |time|
@@ -41,7 +41,7 @@ module VideoScreenshoter
       else
         raise ArgumentError.new('times or number required') if times.empty?
       end
-      
+
       self.size = params[:size] ? "-s #{params[:size]}" : ''
 
       # TODO possibility to replace original image by presetted image

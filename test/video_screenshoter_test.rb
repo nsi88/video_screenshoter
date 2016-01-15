@@ -4,15 +4,29 @@ class VideoScreenshoterTest < Test::Unit::TestCase
   context 'video' do
     setup do
       @input = 'http://techslides.com/demos/sample-videos/small.mp4'
+      @short_input = 'test/fixtures/short_test.avi'
       @output_dir = '/tmp/video_screenshots_test'
       `rm -r #{@output_dir}` if File.exists?(@output_dir)
     end
-    
+
     context '' do
       setup do
         VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%']).make_screenshots
       end
-      
+
+      should 'create screenshots' do
+        [1, 2, 3, 5].each do |sec|
+          assert File.exists? File.join(@output_dir, "scr00#{sec}.jpg")
+          assert File.size(File.join(@output_dir, "scr00#{sec}.jpg")) > 0
+        end
+      end
+    end
+
+    context 'with short video' do
+      setup do
+        VideoScreenshoter.new(:input => @short_input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%']).make_screenshots
+      end
+
       should 'create screenshots' do
         [1, 2, 3, 5].each do |sec|
           assert File.exists? File.join(@output_dir, "scr00#{sec}.jpg")
@@ -52,7 +66,7 @@ class VideoScreenshoterTest < Test::Unit::TestCase
         @output_dir = '/tmp/hls_screenshots_test'
         `rm -r  #{@output_dir}` if File.exists? @output_dir
       end
-      
+
       context '' do
         setup do
           VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => ['10%', '50%', '-10%']).make_thumbnails
