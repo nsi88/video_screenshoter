@@ -15,7 +15,7 @@ module VideoScreenshoter
       self.input = params[:input]
       self.duration = input_duration
       raise ArgumentError.new('Incorrect or empty m3u8 playlist') if duration.nil? || duration <= 0
-    
+
       # if false ffmpeg uses fast seek by keyframes like: ffmpeg -ss ... -i
       self.exact = params[:exact]
 

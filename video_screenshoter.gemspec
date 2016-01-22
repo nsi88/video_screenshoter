@@ -22,6 +22,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "test-unit"
   spec.add_development_dependency "shoulda-context"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-byebug"
 
   spec.requirements << 'ffmpeg'
   spec.requirements << 'imagemagick'

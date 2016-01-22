@@ -4,14 +4,14 @@ class VideoScreenshoterTest < Test::Unit::TestCase
   context 'video' do
     setup do
       @input = 'http://techslides.com/demos/sample-videos/small.mp4'
-      @short_input = 'test/fixtures/short_test.avi'
+      @short_input = File.join(Dir.pwd, 'test/fixtures/short_test.avi')
       @output_dir = '/tmp/video_screenshots_test'
       `rm -r #{@output_dir}` if File.exists?(@output_dir)
     end
 
     context '' do
       setup do
-        VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%']).make_screenshots
+        VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%'], verbose: true).make_screenshots
       end
 
       should 'create screenshots' do
@@ -24,20 +24,23 @@ class VideoScreenshoterTest < Test::Unit::TestCase
 
     context 'with short video' do
       setup do
-        VideoScreenshoter.new(:input => @short_input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%']).make_screenshots
+        VideoScreenshoter.new(:input => @short_input, :output_dir => @output_dir, :times => [1, -2, '50%', '-10%'], verbose: true).make_screenshots
       end
 
       should 'create screenshots' do
-        [1, 2, 3, 5].each do |sec|
-          assert File.exists? File.join(@output_dir, "scr00#{sec}.jpg")
-          assert File.size(File.join(@output_dir, "scr00#{sec}.jpg")) > 0
+        [-1, 0].each do |sec|
+          puts "FILE: #{File.join(@output_dir, "scr00#{sec}.jpg")}"
+          assert File.exists? File.join(@output_dir, "scr-01.jpg")
+          assert File.exists? File.join(@output_dir, "scr000.jpg")
+          assert File.size(File.join(@output_dir, "scr-01.jpg")) > 0
+          assert File.size(File.join(@output_dir, "scr000.jpg")) > 0
         end
       end
     end
 
     context 'with presets' do
       setup do
-        VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => [1, -1], :presets => {:big => '1024x768', :small => '-resize 400x100^ -gravity center -crop 400x100+0+0'}, :imagemagick => '/usr/bin/convert').make_screenshots
+        VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => [1, -1], :presets => {:big => '1024x768', :small => '-resize 400x100^ -gravity center -crop 400x100+0+0'}).make_screenshots
       end
       should 'create screenshots' do
         [1,4].each do |sec|
@@ -81,8 +84,7 @@ class VideoScreenshoterTest < Test::Unit::TestCase
 
       context 'with presets' do
         setup do
-          VideoScreenshoter.imagemagick = '/usr/bin/convert'
-          VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => ['10%', '50%', '-10%'], :presets => {:big => '1024x768', :small => '140x100!'}).make_thumbnails
+          VideoScreenshoter.new(:input => @input, :output_dir => @output_dir, :times => ['10%', '50%', '-10%'], :presets => {:big => '1024x768', :small => '140x100!'}, verbose: true).make_thumbnails
         end
         should 'create screenshots' do
           ["scr1620.jpg", "scr180.jpg", "scr900.jpg"].each do |scr|

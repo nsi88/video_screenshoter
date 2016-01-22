@@ -35,13 +35,13 @@ module VideoScreenshoter
     alias :make_thumbnails :run
 
     private
-    
+
     attr_accessor :chunks
 
     def input_duration
       (self.chunks = parse_playlist).map(&:first).inject(:+)
     end
-    
+
     def parse_playlist
       require 'open-uri'
       open(input) { |f| f.read }.scan(/EXTINF:([\d.]+).*?\n(.*?)\n/).map { |c| [c.first.to_f, c.last] }
